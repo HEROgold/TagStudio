@@ -10,7 +10,6 @@ from tempfile import TemporaryDirectory
 import pytest
 import structlog
 
-from tagstudio.core.constants import IGNORE_NAME, TS_FOLDER_NAME
 from tagstudio.core.library.alchemy.enums import BrowsingState
 from tagstudio.core.library.alchemy.fields import (
     FieldID,  # pyright: ignore[reportPrivateUsage]
@@ -23,55 +22,55 @@ logger = structlog.get_logger()
 
 
 def test_library_add_alias(library: Library, generate_tag: Callable[..., Tag]):
-    tag = (library.add_tag(generate_tag("xxx", id=123)))
+    tag = library.add_tag(generate_tag("xxx", id=123))
 
     parent_ids: set[int] = set()
     alias_ids: set[int] = set()
     alias_names: set[str] = set()
     alias_names.add("test_alias")
     library.update_tag(tag, parent_ids, alias_names, alias_ids)
-    tag = (library.get_tag(tag.id))
+    tag = library.get_tag(tag.id)
     alias_ids = set(tag.alias_ids)
 
     assert len(alias_ids) == 1
 
 
 def test_library_get_alias(library: Library, generate_tag: Callable[..., Tag]):
-    tag = (library.add_tag(generate_tag("xxx", id=123)))
+    tag = library.add_tag(generate_tag("xxx", id=123))
 
     parent_ids: set[int] = set()
     alias_ids: list[int] = []
     alias_names: set[str] = set()
     alias_names.add("test_alias")
     library.update_tag(tag, parent_ids, alias_names, alias_ids)
-    tag = (library.get_tag(tag.id))
+    tag = library.get_tag(tag.id)
     alias_ids = tag.alias_ids
 
-    alias = (library.get_alias(tag.id, alias_ids[0]))
+    alias = library.get_alias(tag.id, alias_ids[0])
     assert alias.name == "test_alias"
 
 
 def test_library_update_alias(library: Library, generate_tag: Callable[..., Tag]):
-    tag: Tag = (library.add_tag(generate_tag("xxx", id=123)))
+    tag: Tag = library.add_tag(generate_tag("xxx", id=123))
 
     parent_ids: set[int] = set()
     alias_ids: list[int] = []
     alias_names: set[str] = set()
     alias_names.add("test_alias")
     library.update_tag(tag, parent_ids, alias_names, alias_ids)
-    tag = (library.get_tag(tag.id))
+    tag = library.get_tag(tag.id)
     alias_ids = tag.alias_ids
 
-    alias = (library.get_alias(tag.id, alias_ids[0]))
+    alias = library.get_alias(tag.id, alias_ids[0])
     assert alias.name == "test_alias"
 
     alias_names.remove("test_alias")
     alias_names.add("alias_update")
     library.update_tag(tag, parent_ids, alias_names, alias_ids)
 
-    tag = (library.get_tag(tag.id))
+    tag = library.get_tag(tag.id)
     assert len(tag.alias_ids) == 1
-    alias = (library.get_alias(tag.id, tag.alias_ids[0]))
+    alias = library.get_alias(tag.id, tag.alias_ids[0])
     assert alias.name == "alias_update"
 
 
@@ -94,10 +93,10 @@ def test_create_tag(library: Library, generate_tag: Callable[..., Tag]):
     assert library.add_tag(generate_tag("foo", id=1000)) is None
 
     # new tag name
-    tag = (library.add_tag(generate_tag("xxx", id=123)))
+    tag = library.add_tag(generate_tag("xxx", id=123))
     assert tag.id == 123
 
-    tag_inc = (library.add_tag(generate_tag("yyy")))
+    tag_inc = library.add_tag(generate_tag("yyy"))
     assert tag_inc.id > 1000
 
 
@@ -106,11 +105,11 @@ def test_tag_self_parent(library: Library, generate_tag: Callable[..., Tag]):
     assert library.add_tag(generate_tag("foo", id=1000)) is None
 
     # new tag name
-    tag = (library.add_tag(generate_tag("xxx", id=123)))
+    tag = library.add_tag(generate_tag("xxx", id=123))
     assert tag.id == 123
 
     library.update_tag(tag, {tag.id}, [], [])
-    tag = (library.get_tag(tag.id))
+    tag = library.get_tag(tag.id)
     assert len(tag.parent_ids) == 0
 
 
@@ -137,12 +136,12 @@ def test_tag_search(library: Library):
 
 
 def test_get_entry(library: Library, entry_min: Entry):
-    result = (library.get_entry_full((entry_min.id)))
+    result = library.get_entry_full(entry_min.id)
     assert len(result.tags) == 1
 
 
 def test_entries_count(library: Library):
-    folder = (library.folder)
+    folder = library.folder
     entries = [Entry(path=Path(f"{x}.txt"), folder=folder, fields=[]) for x in range(10)]
     new_ids = library.add_entries(entries)
     assert len(new_ids) == 10
@@ -158,18 +157,18 @@ def test_parents_add(library: Library, generate_tag: Callable[..., Tag]):
     tag: Tag = library.tags[0]
 
     parent_tag: Tag = generate_tag("parent_tag_01")
-    parent_tag = (library.add_tag(parent_tag))
+    parent_tag = library.add_tag(parent_tag)
 
     # When
     assert library.add_parent_tag(tag.id, (parent_tag.id))
 
     # Then
-    tag = (library.get_tag((tag.id)))
+    tag = library.get_tag(tag.id)
     assert tag.parent_ids
 
 
 def test_remove_tag(library: Library, generate_tag: Callable[..., Tag]):
-    tag = (library.add_tag(generate_tag("food", id=123)))
+    tag = library.add_tag(generate_tag("food", id=123))
 
     tag_count = len(library.tags)
 
@@ -196,6 +195,7 @@ def test_search_library_case_insensitive(library: Library):
     assert len(results) == 1
 
     assert results[0] == entry.id
+
 
 def test_remove_entry_field(library: Library, entry_full: Entry):
     title_field = entry_full.text_fields[0]
@@ -274,13 +274,13 @@ def test_mirror_entry_fields(library: Library, entry_full: Entry):
     entry_id = library.add_entries([target_entry])[0]
 
     # get new entry from library
-    new_entry = (library.get_entry_full(entry_id))
+    new_entry = library.get_entry_full(entry_id)
 
     # mirror fields onto new entry
     library.mirror_entry_fields(new_entry, entry_full)
 
     # get new entry from library again
-    entry = (library.get_entry_full(entry_id))
+    entry = library.get_entry_full(entry_id)
 
     # make sure fields are there after getting it from the library again
     assert len(entry.fields) == 2
@@ -291,11 +291,11 @@ def test_mirror_entry_fields(library: Library, entry_full: Entry):
 
 
 def test_merge_entries(library: Library):
-    folder = (library.folder)
+    folder = library.folder
 
-    tag_0: Tag = (library.add_tag(Tag(id=1010, name="tag_0")))
-    tag_1: Tag = (library.add_tag(Tag(id=1011, name="tag_1")))
-    tag_2: Tag = (library.add_tag(Tag(id=1012, name="tag_2")))
+    tag_0: Tag = library.add_tag(Tag(id=1010, name="tag_0"))
+    tag_1: Tag = library.add_tag(Tag(id=1011, name="tag_1"))
+    tag_2: Tag = library.add_tag(Tag(id=1012, name="tag_2"))
 
     a = Entry(
         folder=folder,
@@ -315,14 +315,14 @@ def test_merge_entries(library: Library):
     library.add_tags_to_entries(ids[0], [tag_0.id, tag_2.id])
     library.add_tags_to_entries(ids[1], [tag_1.id])
 
-    entry_a: Entry = (library.get_entry_full(ids[0]))
-    entry_b: Entry = (library.get_entry_full(ids[1]))
+    entry_a: Entry = library.get_entry_full(ids[0])
+    entry_b: Entry = library.get_entry_full(ids[1])
 
     assert library.merge_entries(entry_a, entry_b)
     assert not library.has_path_entry(Path("a"))
     assert library.has_path_entry(Path("b"))
 
-    entry_b_merged = (library.get_entry_full(ids[1]))
+    entry_b_merged = library.get_entry_full(ids[1])
 
     fields = [field.value for field in entry_b_merged.fields]
     assert "Author McAuthorson" in fields

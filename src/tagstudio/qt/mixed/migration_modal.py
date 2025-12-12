@@ -16,6 +16,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QMessageBox,
     QProgressDialog,
+    QPushButton,
     QSizePolicy,
     QVBoxLayout,
     QWidget,
@@ -30,7 +31,6 @@ from tagstudio.core.constants import (
     TAG_META,
     TS_FOLDER_NAME,
 )
-from tagstudio.core.enums import LibraryPrefs
 from tagstudio.core.library.alchemy import default_color_groups
 from tagstudio.core.library.alchemy.constants import SQL_FILENAME
 from tagstudio.core.library.alchemy.joins import TagParent
@@ -44,7 +44,6 @@ from tagstudio.qt.translations import Translations
 from tagstudio.qt.utils.custom_runnable import CustomRunnable
 from tagstudio.qt.utils.function_iterator import FunctionIterator
 from tagstudio.qt.views.paged_body_wrapper import PagedBodyWrapper
-from tagstudio.qt.views.qbutton_wrapper import QPushButtonWrapper
 
 logger = structlog.get_logger(__name__)
 
@@ -96,8 +95,8 @@ class JsonMigrationModal(QObject):
         body_wrapper.layout().addWidget(body_label)
         body_wrapper.layout().setContentsMargins(0, 36, 0, 0)
 
-        cancel_button = QPushButtonWrapper(Translations["generic.cancel"])
-        next_button = QPushButtonWrapper(Translations["generic.continue"])
+        cancel_button = QPushButton(Translations["generic.cancel"])
+        next_button = QPushButton(Translations["generic.continue"])
         cancel_button.clicked.connect(self.migration_cancelled.emit)
 
         self.stack.append(
@@ -296,14 +295,12 @@ class JsonMigrationModal(QObject):
         self.body_wrapper_01.layout().addWidget(desc_label)
         self.body_wrapper_01.layout().setSpacing(12)
 
-        back_button = QPushButtonWrapper(Translations["generic.navigation.back"])
-        start_button = QPushButtonWrapper(Translations["json_migration.start_and_preview"])
+        back_button = QPushButton(Translations["generic.navigation.back"])
+        start_button = QPushButton(Translations["json_migration.start_and_preview"])
         start_button.setMinimumWidth(120)
         start_button.clicked.connect(self.migrate)
         start_button.clicked.connect(lambda: start_button.setDisabled(True))
-        finish_button: QPushButtonWrapper = QPushButtonWrapper(
-            Translations["json_migration.finish_migration"]
-        )
+        finish_button: QPushButton = QPushButton(Translations["json_migration.finish_migration"])
         finish_button.setMinimumWidth(120)
         finish_button.setDisabled(True)
         finish_button.clicked.connect(self.finish_migration)
@@ -390,7 +387,7 @@ class JsonMigrationModal(QObject):
                     pb.setMinimum(1),  # type: ignore
                     pb.setValue(1),  # type: ignore
                     # Enable the finish button
-                    cast(QPushButtonWrapper, self.stack[1].buttons[4]).setDisabled(False),
+                    cast(QPushButton, self.stack[1].buttons[4]).setDisabled(False),
                 )
             )
             QThreadPool.globalInstance().start(r)
@@ -467,14 +464,15 @@ class JsonMigrationModal(QObject):
             len(self.sql_lib.tags),
             self.old_tag_count,
         )
+        sql_extensions, sql_is_exclude = self.sql_lib.get_extension_filters()
         self.update_sql_value(
             self.ext_row,
-            len(self.sql_lib.prefs(LibraryPrefs.EXTENSION_LIST)),
+            len(sql_extensions),
             self.old_ext_count,
         )
         self.update_sql_value(
             self.ext_type_row,
-            self.sql_lib.prefs(LibraryPrefs.IS_EXCLUDE_LIST),  # pyright: ignore[reportArgumentType]
+            sql_is_exclude,
             self.old_ext_type,
         )
         logger.info("Parity check complete!")
@@ -562,7 +560,7 @@ class JsonMigrationModal(QObject):
             sql_fields: list[tuple] = []
             json_fields: list[tuple] = []
 
-            sql_entry: Entry = (self.sql_lib.get_entry_full(json_entry.id + 1))
+            sql_entry: Entry = self.sql_lib.get_entry_full(json_entry.id + 1)
             if not sql_entry:
                 logger.info(
                     "[Field Comparison]",
@@ -670,7 +668,8 @@ class JsonMigrationModal(QObject):
         return self.subtag_parity
 
     def check_ext_type(self) -> bool:
-        return self.json_lib.is_exclude_list == self.sql_lib.prefs(LibraryPrefs.IS_EXCLUDE_LIST)
+        _, sql_is_exclude = self.sql_lib.get_extension_filters()
+        return self.json_lib.is_exclude_list == sql_is_exclude
 
     def check_alias_parity(self) -> bool:
         """Check if all JSON aliases match the new SQL aliases."""

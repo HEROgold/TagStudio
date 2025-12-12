@@ -5,16 +5,17 @@
 
 """A pagination widget created for TagStudio."""
 
+import contextlib
+import warnings
 from typing import cast, override
 
 from PIL import Image, ImageQt
 from PySide6.QtCore import QSize, Signal
 from PySide6.QtGui import QIntValidator, QPixmap
-from PySide6.QtWidgets import QHBoxLayout, QLabel, QLineEdit, QSizePolicy, QWidget
+from PySide6.QtWidgets import QHBoxLayout, QLabel, QLineEdit, QPushButton, QSizePolicy, QWidget
 
 from tagstudio.qt.helpers.color_overlay import theme_fg_overlay
 from tagstudio.qt.resource_manager import ResourceManager
-from tagstudio.qt.views.qbutton_wrapper import QPushButtonWrapper
 
 
 class Pagination(QWidget):
@@ -44,7 +45,7 @@ class Pagination(QWidget):
         self.root_layout.setSpacing(3)
 
         # [<] ----------------------------------
-        self.prev_button = QPushButtonWrapper()
+        self.prev_button = QPushButton()
         prev_icon: Image.Image = self.rm.get("bxs-left-arrow")  # pyright: ignore[reportAssignmentType]
         prev_icon = theme_fg_overlay(prev_icon, use_alpha=False)
         self.prev_button.setIcon(QPixmap.fromImage(ImageQt.ImageQt(prev_icon)))
@@ -53,7 +54,7 @@ class Pagination(QWidget):
         self.prev_button.setMaximumSize(self.button_size)
 
         # --- [1] ------------------------------
-        self.start_button = QPushButtonWrapper()
+        self.start_button = QPushButton()
         self.start_button.setMinimumSize(self.button_size)
         self.start_button.setMaximumSize(self.button_size)
 
@@ -92,12 +93,12 @@ class Pagination(QWidget):
         self.end_ellipses.setText(". . .")
 
         # ----------------------------- [42] ---
-        self.end_button = QPushButtonWrapper()
+        self.end_button = QPushButton()
         self.end_button.setMinimumSize(self.button_size)
         self.end_button.setMaximumSize(self.button_size)
 
         # ---------------------------------- [>]
-        self.next_button = QPushButtonWrapper()
+        self.next_button = QPushButton()
         next_icon: Image.Image = self.rm.get("bxs-right-arrow")  # pyright: ignore[reportAssignmentType]
         next_icon = theme_fg_overlay(next_icon, use_alpha=False)
         self.next_button.setIcon(QPixmap.fromImage(ImageQt.ImageQt(next_icon)))
@@ -224,7 +225,7 @@ class Pagination(QWidget):
                         )
                         self._assign_click(
                             cast(
-                                QPushButtonWrapper,
+                                QPushButton,
                                 self.start_buffer_layout.itemAt(i - start_offset).widget(),
                             ),
                             i,
@@ -243,7 +244,7 @@ class Pagination(QWidget):
                         )
                         self._assign_click(
                             cast(
-                                QPushButtonWrapper,
+                                QPushButton,
                                 self.end_buffer_layout.itemAt(i - end_offset).widget(),
                             ),
                             i,
@@ -271,21 +272,23 @@ class Pagination(QWidget):
     def _goto_page(self, index: int):
         self.update_buttons(self.page_count, index)
 
-    def _assign_click(self, button: QPushButtonWrapper, index):
-        if button.is_connected:
-            button.clicked.disconnect()
+    def _assign_click(self, button: QPushButton, index):
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore", category=RuntimeWarning)
+            with contextlib.suppress(RuntimeError, TypeError):
+                button.clicked.disconnect()
+
         button.clicked.connect(lambda checked=False, i=index: self._goto_page(i))
-        button.is_connected = True
 
     def _populate_buffer_buttons(self):
         for _ in range(max(self.buffer_page_count * 2, 5)):
-            button = QPushButtonWrapper()
+            button = QPushButton()
             button.setMinimumSize(self.button_size)
             button.setMaximumSize(self.button_size)
             button.setHidden(True)
             self.start_buffer_layout.addWidget(button)
 
-            end_button = QPushButtonWrapper()
+            end_button = QPushButton()
             end_button.setMinimumSize(self.button_size)
             end_button.setMaximumSize(self.button_size)
             end_button.setHidden(True)

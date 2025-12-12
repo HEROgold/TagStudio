@@ -7,7 +7,6 @@ from tempfile import TemporaryDirectory
 
 import pytest
 
-from tagstudio.core.enums import LibraryPrefs
 from tagstudio.core.library.alchemy.library import Library
 from tagstudio.core.library.refresh import RefreshTracker
 
@@ -19,8 +18,7 @@ CWD = Path(__file__).parent
 def test_refresh_new_files(library: Library, exclude_mode: bool):
     library_dir = library.library_dir
     # Given
-    library.set_prefs(LibraryPrefs.IS_EXCLUDE_LIST, exclude_mode)
-    library.set_prefs(LibraryPrefs.EXTENSION_LIST, [".md"])
+    library.write_extension_filters(["md"], exclude_mode)
     registry = RefreshTracker(library=library)
     library.included_files.clear()
     (library_dir / "FOO.MD").touch()

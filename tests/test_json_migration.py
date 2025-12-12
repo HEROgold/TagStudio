@@ -43,9 +43,10 @@ def test_json_migration():
 
     # Extension Filter List ====================================================
     # Count
-    assert len(modal.json_lib.ext_list) == len(modal.sql_lib.prefs(LibraryPrefs.EXTENSION_LIST))
+    sql_extensions, _ = modal.sql_lib.get_extension_filters()
+    assert len(modal.json_lib.ext_list) == len(sql_extensions)
     # List Type
     assert modal.check_ext_type()
     # No Leading Dot
-    for ext in modal.sql_lib.prefs(LibraryPrefs.EXTENSION_LIST):  # pyright: ignore[reportUnknownVariableType]
+    for ext in sql_extensions:
         assert ext[0] != "."

@@ -47,9 +47,9 @@ class TagBoxWidget(TagBoxWidgetView):
                 #       due to needing to implement a visitor that turns an AST to a string
                 #       So if that exists when you read this, change the following accordingly.
                 current = self.__driver.browsing_history.current
-                suffix = (
-                    BrowsingState.from_tag_id(tag.id, self.__driver.browsing_history.current).query
-                )
+                suffix = BrowsingState.from_tag_id(
+                    tag.id, self.__driver.browsing_history.current
+                ).query
                 self.__driver.update_browsing_state(
                     current.with_search_query(
                         f"{current.query} {suffix}" if current.query else suffix

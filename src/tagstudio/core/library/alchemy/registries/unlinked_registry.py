@@ -43,7 +43,7 @@ class UnlinkedRegistry:
 
         Works if files were just moved to different subfolders and don't have duplicate names.
         """
-        library_dir = (self.lib.library_dir)
+        library_dir = self.lib.library_dir
         matches: list[Path] = []
 
         # NOTE: ignore_to_glob() is needed for wcmatch, not ripgrep.
@@ -76,8 +76,8 @@ class UnlinkedRegistry:
                 )
                 if not self.lib.update_entry_path(entry.id, item_matches[0]):
                     try:
-                        match = (self.lib.get_entry_full_by_path(item_matches[0]))
-                        entry_full = (self.lib.get_entry_full(entry.id))
+                        match = self.lib.get_entry_full_by_path(item_matches[0])
+                        entry_full = self.lib.get_entry_full(entry.id)
                         self.lib.merge_entries(entry_full, match)
                     except AttributeError:
                         continue

@@ -35,7 +35,7 @@ class IgnoredRegistry:
         logger.info("[IgnoredRegistry] Refreshing ignored entries...")
 
         self.ignored_entries = []
-        library_dir: Path = (self.lib.library_dir)
+        library_dir: Path = self.lib.library_dir
 
         for i, entry in enumerate(self.lib.all_entries()):
             if not Ignore.compiled_patterns:

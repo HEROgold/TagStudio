@@ -153,7 +153,7 @@ class PreviewPanelView(QWidget):
             # One Item Selected
             elif len(selected) == 1:
                 entry_id = selected[0]
-                entry: Entry = (self.lib.get_entry(entry_id))
+                entry: Entry = self.lib.get_entry(entry_id)
 
                 filepath: Path = (self.lib.library_dir) / entry.path
 

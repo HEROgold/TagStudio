@@ -106,7 +106,7 @@ class FieldContainers(QWidget):
         """Update tags and fields from a single Entry source."""
         logger.warning("[FieldContainers] Updating Selection", entry_id=entry_id)
 
-        entry = (self.lib.get_entry_full(entry_id))
+        entry = self.lib.get_entry_full(entry_id)
         self.cached_entries = [entry]
         self.update_granular(entry.tags, entry.fields, update_badges)
 

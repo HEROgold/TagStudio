@@ -120,9 +120,7 @@ class DropImportModal(QWidget):
                         continue
 
                     self.files.append(f)
-                    if (
-                        self.driver.lib.library_dir / self._get_relative_path(file)
-                    ).exists():
+                    if (self.driver.lib.library_dir / self._get_relative_path(file)).exists():
                         self.duplicate_files.append(f)
 
                 self.dirs_in_root.append(file.parent)
@@ -207,9 +205,7 @@ class DropImportModal(QWidget):
                     new_name = self._get_renamed_duplicate_filename(dest_file)
                     dest_file = dest_file.with_name(new_name)
 
-            (self.driver.lib.library_dir / dest_file).parent.mkdir(
-                parents=True, exist_ok=True
-            )
+            (self.driver.lib.library_dir / dest_file).parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(file, self.driver.lib.library_dir / dest_file)
 
             file_count += 1
