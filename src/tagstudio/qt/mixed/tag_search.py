@@ -3,6 +3,7 @@
 # Created for TagStudio: https://github.com/CyanVoxel/TagStudio
 
 
+from collections.abc import Iterable, Sequence
 import contextlib
 from typing import TYPE_CHECKING, Union
 from warnings import catch_warnings
@@ -45,7 +46,7 @@ class TagSearchModal(PanelModal):
     def __init__(
         self,
         library: Library,
-        exclude: list[int] | None = None,
+        exclude: Iterable[int] | None = None,
         is_tag_chooser: bool = True,
         done_callback=None,
         save_callback=None,
@@ -68,7 +69,7 @@ class TagSearchPanel(PanelWidget):
     is_initialized: bool = False
     first_tag_id: int | None = None
     is_tag_chooser: bool
-    exclude: list[int]
+    exclude: Iterable[int]
 
     _limit_items: list[int | str] = [25, 50, 100, 250, 500, Translations["tag.all_tags"]]
     _default_limit_idx: int = 0  # 50 Tag Limit (Default)
@@ -78,7 +79,7 @@ class TagSearchPanel(PanelWidget):
     def __init__(
         self,
         library: Library,
-        exclude: list[int] | None = None,
+        exclude: Iterable[int] | None = None,
         is_tag_chooser: bool = True,
     ):
         super().__init__()

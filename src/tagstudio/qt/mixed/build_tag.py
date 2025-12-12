@@ -168,7 +168,7 @@ class BuildTagPanel(PanelWidget):
             exclude_ids.add(tag.id)
             exclude_ids.update(self.lib.get_tag_descendants(tag.id))
 
-        self.add_tag_modal = TagSearchModal(self.lib, list(exclude_ids))
+        self.add_tag_modal = TagSearchModal(self.lib, exclude_ids)
         self.add_tag_modal.tsp.tag_chosen.connect(lambda x: self.add_parent_tag_callback(x))
         self.parent_tags_add_button.clicked.connect(self.add_tag_modal.show)
 
