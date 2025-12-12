@@ -63,13 +63,14 @@ class TagSearchModal(PanelModal):
 
 
 class TagSearchPanel(PanelWidget):
-    tag_chosen = Signal(int)
     lib: Library
     driver: Union["QtDriver", None]
-    is_initialized: bool = False
-    first_tag_id: int | None = None
     is_tag_chooser: bool
     exclude: Iterable[int]
+
+    tag_chosen = Signal(int)
+    is_initialized: bool = False
+    first_tag_id: int | None = None
 
     _limit_items: list[int | str] = [25, 50, 100, 250, 500, Translations["tag.all_tags"]]
     _default_limit_idx: int = 0  # 50 Tag Limit (Default)
