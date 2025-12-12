@@ -3,8 +3,8 @@
 # Created for TagStudio: https://github.com/CyanVoxel/TagStudio
 
 
-from collections.abc import Iterable, Sequence
 import contextlib
+from collections.abc import Iterable
 from typing import TYPE_CHECKING, Union
 from warnings import catch_warnings
 
