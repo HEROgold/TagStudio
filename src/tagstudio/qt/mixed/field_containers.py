@@ -31,7 +31,6 @@ from tagstudio.core.library.alchemy.fields import (
 )
 from tagstudio.core.library.alchemy.library import Library
 from tagstudio.core.library.alchemy.models import Entry, Tag
-from tagstudio.core.utils.types import unwrap
 from tagstudio.qt.controllers.tag_box_controller import TagBoxWidget
 from tagstudio.qt.mixed.datetime_picker import DatetimePicker
 from tagstudio.qt.mixed.field_widget import FieldContainer
@@ -107,7 +106,7 @@ class FieldContainers(QWidget):
         """Update tags and fields from a single Entry source."""
         logger.warning("[FieldContainers] Updating Selection", entry_id=entry_id)
 
-        entry = unwrap(self.lib.get_entry_full(entry_id))
+        entry = (self.lib.get_entry_full(entry_id))
         self.cached_entries = [entry]
         self.update_granular(entry.tags, entry.fields, update_badges)
 

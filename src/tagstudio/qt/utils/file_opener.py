@@ -15,7 +15,6 @@ from PySide6.QtGui import QMouseEvent
 from PySide6.QtWidgets import QLabel, QWidget
 
 from tagstudio.core.utils.silent_subprocess import silent_popen  # pyright: ignore
-from tagstudio.core.utils.types import unwrap
 
 logger = structlog.get_logger(__name__)
 
@@ -163,7 +162,7 @@ class FileOpenerLabel(QLabel):
             ev (QMouseEvent): The mouse press event.
         """
         if ev.button() == Qt.MouseButton.LeftButton:
-            opener = FileOpenerHelper(unwrap(self.filepath))
+            opener = FileOpenerHelper(self.filepath)
             opener.open_explorer()
         elif ev.button() == Qt.MouseButton.RightButton:
             # Show context menu

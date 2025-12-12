@@ -9,7 +9,6 @@ from pytestqt.qtbot import QtBot
 
 from tagstudio.core.library.alchemy.library import Library
 from tagstudio.core.library.alchemy.models import Tag, TagAlias
-from tagstudio.core.utils.types import unwrap
 from tagstudio.qt.mixed.build_tag import BuildTagPanel, CustomTableItem
 from tagstudio.qt.translations import Translations
 
@@ -17,8 +16,8 @@ from tagstudio.qt.translations import Translations
 def test_build_tag_panel_add_sub_tag_callback(
     qtbot: QtBot, library: Library, generate_tag: Callable[..., Tag]
 ):
-    parent = unwrap(library.add_tag(generate_tag("xxx", id=123)))
-    child = unwrap(library.add_tag(generate_tag("xx", id=124)))
+    parent = (library.add_tag(generate_tag("xxx", id=123)))
+    child = (library.add_tag(generate_tag("xx", id=124)))
 
     panel: BuildTagPanel = BuildTagPanel(library, child)
     qtbot.addWidget(panel)
@@ -31,12 +30,12 @@ def test_build_tag_panel_add_sub_tag_callback(
 def test_build_tag_panel_remove_subtag_callback(
     qtbot: QtBot, library: Library, generate_tag: Callable[..., Tag]
 ):
-    parent = unwrap(library.add_tag(generate_tag("xxx", id=123)))
-    child = unwrap(library.add_tag(generate_tag("xx", id=124)))
+    parent = (library.add_tag(generate_tag("xxx", id=123)))
+    child = (library.add_tag(generate_tag("xx", id=124)))
 
     library.update_tag(child, {parent.id}, [], [])
 
-    child = unwrap(library.get_tag(child.id))
+    child = (library.get_tag(child.id))
 
     panel: BuildTagPanel = BuildTagPanel(library, child)
     qtbot.addWidget(panel)
@@ -54,7 +53,7 @@ os.environ["QT_QPA_PLATFORM"] = "offscreen"
 def test_build_tag_panel_add_alias_callback(
     qtbot: QtBot, library: Library, generate_tag: Callable[..., Tag]
 ):
-    tag = unwrap(library.add_tag(generate_tag("xxx", id=123)))
+    tag = (library.add_tag(generate_tag("xxx", id=123)))
 
     panel: BuildTagPanel = BuildTagPanel(library, tag)
     qtbot.addWidget(panel)
@@ -67,11 +66,11 @@ def test_build_tag_panel_add_alias_callback(
 def test_build_tag_panel_remove_alias_callback(
     qtbot: QtBot, library: Library, generate_tag: Callable[..., Tag]
 ):
-    tag: Tag = unwrap(library.add_tag(generate_tag("xxx", id=123)))
+    tag: Tag = (library.add_tag(generate_tag("xxx", id=123)))
 
     library.update_tag(tag, [], {"alias", "alias_2"}, {123, 124})
 
-    tag = unwrap(library.get_tag(tag.id))
+    tag = (library.get_tag(tag.id))
 
     assert "alias" in tag.alias_strings
     assert "alias_2" in tag.alias_strings
@@ -79,7 +78,7 @@ def test_build_tag_panel_remove_alias_callback(
     panel: BuildTagPanel = BuildTagPanel(library, tag)
     qtbot.addWidget(panel)
 
-    alias: TagAlias = unwrap(library.get_alias(tag.id, tag.alias_ids[0]))
+    alias: TagAlias = (library.get_alias(tag.id, tag.alias_ids[0]))
 
     panel.remove_alias_callback(alias.name, alias.id)
 
@@ -91,8 +90,8 @@ def test_build_tag_panel_remove_alias_callback(
 def test_build_tag_panel_set_parent_tags(
     qtbot: QtBot, library: Library, generate_tag: Callable[..., Tag]
 ):
-    parent = unwrap(library.add_tag(generate_tag("parent", id=123)))
-    child = unwrap(library.add_tag(generate_tag("child", id=124)))
+    parent = (library.add_tag(generate_tag("parent", id=123)))
+    child = (library.add_tag(generate_tag("child", id=124)))
 
     library.add_parent_tag(parent.id, child.id)
 
@@ -108,11 +107,11 @@ def test_build_tag_panel_set_parent_tags(
 def test_build_tag_panel_add_aliases(
     qtbot: QtBot, library: Library, generate_tag: Callable[..., Tag]
 ):
-    tag: Tag = unwrap(library.add_tag(generate_tag("xxx", id=123)))
+    tag: Tag = (library.add_tag(generate_tag("xxx", id=123)))
 
     library.update_tag(tag, [], {"alias", "alias_2"}, {123, 124})
 
-    tag = unwrap(library.get_tag(tag.id))
+    tag = (library.get_tag(tag.id))
 
     assert "alias" in tag.alias_strings
     assert "alias_2" in tag.alias_strings
@@ -146,11 +145,11 @@ def test_build_tag_panel_add_aliases(
 def test_build_tag_panel_set_aliases(
     qtbot: QtBot, library: Library, generate_tag: Callable[..., Tag]
 ):
-    tag: Tag = unwrap(library.add_tag(generate_tag("xxx", id=123)))
+    tag: Tag = (library.add_tag(generate_tag("xxx", id=123)))
 
     library.update_tag(tag, [], {"alias"}, {123})
 
-    tag = unwrap(library.get_tag(tag.id))
+    tag = (library.get_tag(tag.id))
 
     assert len(tag.alias_ids) == 1
 
@@ -163,12 +162,12 @@ def test_build_tag_panel_set_aliases(
 
 
 def test_build_tag_panel_set_tag(qtbot: QtBot, library: Library, generate_tag: Callable[..., Tag]):
-    tag = unwrap(library.add_tag(generate_tag("xxx", id=123)))
+    tag = (library.add_tag(generate_tag("xxx", id=123)))
 
     panel: BuildTagPanel = BuildTagPanel(library, tag)
     qtbot.addWidget(panel)
 
-    assert unwrap(panel.tag).name == "xxx"
+    assert (panel.tag).name == "xxx"
 
 
 def test_build_tag_panel_build_tag(qtbot: QtBot, library: Library):

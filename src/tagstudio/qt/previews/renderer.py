@@ -64,7 +64,6 @@ from tagstudio.core.exceptions import NoRendererError
 from tagstudio.core.library.ignore import Ignore
 from tagstudio.core.media_types import MediaCategories, MediaType
 from tagstudio.core.utils.encoding import detect_char_encoding
-from tagstudio.core.utils.types import unwrap
 from tagstudio.qt.global_settings import DEFAULT_CACHED_IMAGE_RES
 from tagstudio.qt.helpers.color_overlay import theme_fg_overlay
 from tagstudio.qt.helpers.file_tester import is_readable_video
@@ -119,7 +118,7 @@ class _TarFile(tarfile.TarFile):
         return self.getnames()
 
     def read(self, name: str) -> bytes:
-        return unwrap(self.extractfile(name)).read()
+        return self.extractfile(name).read()
 
 
 type _Archive_T = (
@@ -955,7 +954,7 @@ class ThumbRenderer(QObject):
         cover = comic_info.find(f"./*Page[@Type='{cover_type}']")
         if cover is not None:
             pages = [f for f in archive.namelist() if f != "ComicInfo.xml"]
-            page_name = pages[int(unwrap(cover.get("Image")))]
+            page_name = pages[int(cover.get("Image"))]
             if page_name.endswith((".png", ".jpg", ".jpeg", ".gif", ".bmp", ".svg")):
                 image_data = archive.read(page_name)
                 im = Image.open(BytesIO(image_data))
@@ -1128,7 +1127,7 @@ class ThumbRenderer(QObject):
                 new_bg = Image.new("RGB", im.size, color="#1e1e1e")
                 new_bg.paste(im, mask=im.getchannel(3))
                 im = new_bg
-            im = unwrap(ImageOps.exif_transpose(im))
+            im = ImageOps.exif_transpose(im)
         except (
             FileNotFoundError,
             UnidentifiedImageError,
@@ -1531,7 +1530,7 @@ class ThumbRenderer(QObject):
                     image
                     and Ignore.compiled_patterns
                     and Ignore.compiled_patterns.match(
-                        filepath.relative_to(unwrap(self.driver.lib.library_dir))
+                        filepath.relative_to(self.driver.lib.library_dir)
                     )
                 ):
                     image = render_ignored((adj_size, adj_size), pixel_ratio, image)

@@ -3,7 +3,6 @@
 # Created for TagStudio: https://github.com/CyanVoxel/TagStudio
 
 from tagstudio.core.library.alchemy.enums import BrowsingState
-from tagstudio.core.utils.types import unwrap
 from tagstudio.qt.ts_qt import QtDriver
 
 
@@ -22,20 +21,20 @@ def test_browsing_state_update(qt_driver: QtDriver):
     state = BrowsingState.from_tag_name("foo")
     qt_driver.update_browsing_state(state)
     assert len(qt_driver.frame_content) == 1
-    entry = unwrap(qt_driver.lib.get_entry_full(qt_driver.frame_content[0]))
+    entry = (qt_driver.lib.get_entry_full(qt_driver.frame_content[0]))
     assert list(entry.tags)[0].name == "foo"
 
     # When state is not changed, previous one is still applied
     qt_driver.update_browsing_state()
     assert len(qt_driver.frame_content) == 1
-    entry = unwrap(qt_driver.lib.get_entry_full(qt_driver.frame_content[0]))
+    entry = (qt_driver.lib.get_entry_full(qt_driver.frame_content[0]))
     assert list(entry.tags)[0].name == "foo"
 
     # When state property is changed, previous one is overwritten
     state = BrowsingState.from_path("*bar.md")
     qt_driver.update_browsing_state(state)
     assert len(qt_driver.frame_content) == 1
-    entry = unwrap(qt_driver.lib.get_entry_full(qt_driver.frame_content[0]))
+    entry = (qt_driver.lib.get_entry_full(qt_driver.frame_content[0]))
     assert list(entry.tags)[0].name == "bar"
 
 

@@ -26,7 +26,6 @@ from tagstudio.core.constants import TAG_ARCHIVED, TAG_FAVORITE
 from tagstudio.core.library.alchemy.enums import TagColorEnum
 from tagstudio.core.library.alchemy.library import Library
 from tagstudio.core.library.alchemy.models import Tag
-from tagstudio.core.utils.types import unwrap
 from tagstudio.qt.models.palette import ColorType, get_tag_color
 from tagstudio.qt.translations import Translations
 from tagstudio.qt.views.layouts.flow_layout import FlowLayout
@@ -96,7 +95,7 @@ def reverse_tag(library: Library, tag: Tag, items: list[Tag] | None) -> list[Tag
     parent_tag = None  # to avoid subtag unbound error
     for parent_tag_id in tag.parent_ids:
         parent_tag = library.get_tag(parent_tag_id)
-    return reverse_tag(library, unwrap(parent_tag), items)
+    return reverse_tag(library, parent_tag, items)
 
 
 # =========== UI ===========
@@ -276,7 +275,7 @@ class TreeItem(QWidget):
 
         self.label = QLabel()
         self.tag_layout.addWidget(self.label)
-        self.tag_widget = ModifiedTagWidget(unwrap(data.tag), unwrap(parent_tag))
+        self.tag_widget = ModifiedTagWidget(data.tag, parent_tag)
         self.tag_widget.bg_button.clicked.connect(lambda: self.hide_show())
         self.tag_layout.addWidget(self.tag_widget)
 

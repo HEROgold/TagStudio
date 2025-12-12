@@ -104,7 +104,6 @@ from tagstudio.core.library.alchemy.models import (
 )
 from tagstudio.core.library.alchemy.visitors import SQLBoolExpressionBuilder
 from tagstudio.core.library.json.library import Library as JsonLibrary
-from tagstudio.core.utils.types import unwrap
 from tagstudio.qt.translations import Translations
 
 if TYPE_CHECKING:
@@ -910,7 +909,7 @@ class Library:
     @property
     def entries_count(self) -> int:
         with Session(self.engine) as session:
-            return unwrap(session.scalar(select(func.count(Entry.id))))
+            return (session.scalar(select(func.count(Entry.id))))
 
     def all_entries(self, with_joins: bool = False) -> Iterator[Entry]:
         """Load entries without joins."""
@@ -1028,7 +1027,7 @@ class Library:
         assert isinstance(search, BrowsingState)
         assert self.library_dir
 
-        with Session(unwrap(self.engine), expire_on_commit=False) as session:
+        with Session((self.engine), expire_on_commit=False) as session:
             if page_size:
                 statement = (
                     select(Entry.id, func.count().over())
@@ -1299,7 +1298,7 @@ class Library:
 
     def get_value_type(self, field_key: str) -> ValueType:
         with Session(self.engine) as session:
-            field = unwrap(session.scalar(select(ValueType).where(ValueType.key == field_key)))
+            field = (session.scalar(select(ValueType).where(ValueType.key == field_key)))
             session.expunge(field)
             return field
 
@@ -1324,7 +1323,7 @@ class Library:
         if not field:
             if isinstance(field_id, FieldID):
                 field_id = field_id.name
-            field = self.get_value_type(unwrap(field_id))
+            field = self.get_value_type((field_id))
 
         field_model: TextField | DatetimeField
         if field.type in (FieldTypeEnum.TEXT_LINE, FieldTypeEnum.TEXT_BOX):
@@ -1929,7 +1928,7 @@ class Library:
                 # by older TagStudio versions.
                 engine = sqlalchemy.inspect(self.engine)
                 if engine and engine.has_table("Preferences"):
-                    pref = unwrap(
+                    pref = (
                         session.scalar(
                             select(Preferences).where(Preferences.key == DB_VERSION_LEGACY_KEY)
                         )
@@ -1947,11 +1946,11 @@ class Library:
         # load given item from Preferences table
         with Session(self.engine) as session:
             if isinstance(key, LibraryPrefs):
-                return unwrap(
+                return (
                     session.scalar(select(Preferences).where(Preferences.key == key.name))
                 ).value  # pyright: ignore[reportUnknownVariableType]
             else:
-                return unwrap(
+                return (
                     session.scalar(select(Preferences).where(Preferences.key == key))
                 ).value  # pyright: ignore[reportUnknownVariableType]
 
@@ -1964,7 +1963,7 @@ class Library:
             stuff = session.scalars(select(Preferences))
             logger.info([x.key for x in list(stuff)])
 
-            pref: Preferences = unwrap(
+            pref: Preferences = (
                 session.scalar(
                     select(Preferences).where(
                         Preferences.key == (key.name if isinstance(key, LibraryPrefs) else key)

@@ -8,7 +8,6 @@ from wcmatch import pathlib
 from tagstudio.core.library.alchemy.library import Library
 from tagstudio.core.library.alchemy.models import Entry
 from tagstudio.core.library.ignore import PATH_GLOB_FLAGS, Ignore, ignore_to_glob
-from tagstudio.core.utils.types import unwrap
 
 logger = structlog.get_logger()
 
@@ -34,7 +33,7 @@ class UnlinkedRegistry:
 
         self.unlinked_entries = []
         for i, entry in enumerate(self.lib.all_entries()):
-            full_path = unwrap(self.lib.library_dir) / entry.path
+            full_path = (self.lib.library_dir) / entry.path
             if not full_path.exists() or not full_path.is_file():
                 self.unlinked_entries.append(entry)
             yield i
@@ -44,7 +43,7 @@ class UnlinkedRegistry:
 
         Works if files were just moved to different subfolders and don't have duplicate names.
         """
-        library_dir = unwrap(self.lib.library_dir)
+        library_dir = (self.lib.library_dir)
         matches: list[Path] = []
 
         # NOTE: ignore_to_glob() is needed for wcmatch, not ripgrep.
@@ -77,8 +76,8 @@ class UnlinkedRegistry:
                 )
                 if not self.lib.update_entry_path(entry.id, item_matches[0]):
                     try:
-                        match = unwrap(self.lib.get_entry_full_by_path(item_matches[0]))
-                        entry_full = unwrap(self.lib.get_entry_full(entry.id))
+                        match = (self.lib.get_entry_full_by_path(item_matches[0]))
+                        entry_full = (self.lib.get_entry_full(entry.id))
                         self.lib.merge_entries(entry_full, match)
                     except AttributeError:
                         continue

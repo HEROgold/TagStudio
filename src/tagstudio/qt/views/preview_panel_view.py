@@ -18,7 +18,6 @@ from PySide6.QtWidgets import (
 from tagstudio.core.enums import Theme
 from tagstudio.core.library.alchemy.library import Library
 from tagstudio.core.library.alchemy.models import Entry
-from tagstudio.core.utils.types import unwrap
 from tagstudio.qt.controllers.preview_thumb_controller import PreviewThumb
 from tagstudio.qt.mixed.field_containers import FieldContainers
 from tagstudio.qt.mixed.file_attributes import FileAttributeData, FileAttributes
@@ -154,9 +153,9 @@ class PreviewPanelView(QWidget):
             # One Item Selected
             elif len(selected) == 1:
                 entry_id = selected[0]
-                entry: Entry = unwrap(self.lib.get_entry(entry_id))
+                entry: Entry = (self.lib.get_entry(entry_id))
 
-                filepath: Path = unwrap(self.lib.library_dir) / entry.path
+                filepath: Path = (self.lib.library_dir) / entry.path
 
                 if update_preview:
                     stats: FileAttributeData = self.__thumb.display_file(filepath)

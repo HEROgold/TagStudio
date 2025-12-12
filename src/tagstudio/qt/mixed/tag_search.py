@@ -28,6 +28,7 @@ from tagstudio.core.constants import RESERVED_TAG_END, RESERVED_TAG_START
 from tagstudio.core.library.alchemy.enums import BrowsingState, TagColorEnum
 from tagstudio.core.library.alchemy.library import Library
 from tagstudio.core.library.alchemy.models import Tag
+from tagstudio.core.utils.sentinel import MISSING
 from tagstudio.qt.mixed.tag_widget import TagWidget
 from tagstudio.qt.models.palette import ColorType, get_tag_color
 from tagstudio.qt.translations import Translations
@@ -46,7 +47,7 @@ class TagSearchModal(PanelModal):
     def __init__(
         self,
         library: Library,
-        exclude: Iterable[int] | None = None,
+        exclude: Iterable[int] = MISSING,
         is_tag_chooser: bool = True,
         done_callback=None,
         save_callback=None,
@@ -80,13 +81,13 @@ class TagSearchPanel(PanelWidget):
     def __init__(
         self,
         library: Library,
-        exclude: Iterable[int] | None = None,
+        exclude: Iterable[int] = MISSING,
         is_tag_chooser: bool = True,
     ):
         super().__init__()
         self.lib = library
         self.driver = None
-        self.exclude = exclude or []
+        self.exclude = exclude if exclude is not MISSING else []
 
         self.is_tag_chooser = is_tag_chooser
         self.create_button_in_layout: bool = False

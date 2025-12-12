@@ -19,7 +19,6 @@ sys.path.insert(0, str(CWD.parent))
 from tagstudio.core.constants import THUMB_CACHE_NAME, TS_FOLDER_NAME
 from tagstudio.core.library.alchemy.library import Library
 from tagstudio.core.library.alchemy.models import Entry, Tag
-from tagstudio.core.utils.types import unwrap
 from tagstudio.qt.thumb_grid_layout import ThumbGridLayout
 from tagstudio.qt.ts_qt import QtDriver
 
@@ -35,7 +34,7 @@ def file_mediatypes_library():
 
     status = lib.open_library(Path(""), ":memory:")
     assert status.success
-    folder = unwrap(lib.folder)
+    folder = lib.folder
 
     entry1 = Entry(
         folder=folder,
@@ -86,7 +85,7 @@ def library(request, library_dir: Path):  # pyright: ignore
     lib = Library()
     status = lib.open_library(library_path, ":memory:")
     assert status.success
-    folder = unwrap(lib.folder)
+    folder = lib.folder
 
     tag = Tag(
         name="foo",

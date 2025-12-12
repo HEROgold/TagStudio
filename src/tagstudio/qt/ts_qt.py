@@ -63,7 +63,6 @@ from tagstudio.core.media_types import MediaCategories
 from tagstudio.core.query_lang.util import ParsingError
 from tagstudio.core.ts_core import TagStudioCore
 from tagstudio.core.utils.str_formatting import strip_web_protocol
-from tagstudio.core.utils.types import unwrap
 from tagstudio.qt.cache_manager import CacheManager
 from tagstudio.qt.controllers.ffmpeg_missing_message_box import FfmpegMissingMessageBox
 
@@ -1027,7 +1026,7 @@ class QtDriver(DriverMixin, QObject):
         pw.show()
 
         iterator = FunctionIterator(
-            lambda lib=unwrap(self.lib.library_dir): tracker.refresh_dir(lib)  # noqa: B008
+            lambda lib=(self.lib.library_dir): tracker.refresh_dir(lib)  # noqa: B008
         )
         iterator.value.connect(
             lambda x: (

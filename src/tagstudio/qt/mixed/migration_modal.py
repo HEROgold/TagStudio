@@ -38,7 +38,6 @@ from tagstudio.core.library.alchemy.library import Library as SqliteLibrary
 from tagstudio.core.library.alchemy.models import Entry, TagAlias
 from tagstudio.core.library.json.library import Library as JsonLibrary
 from tagstudio.core.library.json.library import Tag as JsonTag
-from tagstudio.core.utils.types import unwrap
 from tagstudio.qt.controllers.paged_panel_controller import PagedPanel
 from tagstudio.qt.controllers.paged_panel_state import PagedPanelState
 from tagstudio.qt.translations import Translations
@@ -563,7 +562,7 @@ class JsonMigrationModal(QObject):
             sql_fields: list[tuple] = []
             json_fields: list[tuple] = []
 
-            sql_entry: Entry = unwrap(self.sql_lib.get_entry_full(json_entry.id + 1))
+            sql_entry: Entry = (self.sql_lib.get_entry_full(json_entry.id + 1))
             if not sql_entry:
                 logger.info(
                     "[Field Comparison]",
@@ -597,7 +596,7 @@ class JsonMigrationModal(QObject):
                     tags_count += 1
                     json_tags = json_tags.union(value or [])
                 else:
-                    key: str = unwrap(self.sql_lib.get_field_name_from_id(int_key)).name
+                    key: str = (self.sql_lib.get_field_name_from_id(int_key)).name
                     json_fields.append((json_entry.id + 1, key, value))
             json_fields.sort()
 
@@ -715,8 +714,8 @@ class JsonMigrationModal(QObject):
 
         for tag in self.sql_lib.tags:
             tag_id = tag.id  # Tag IDs start at 0
-            sql_name: str = unwrap(sanitize(tag.name))
-            json_name: str = unwrap(sanitize(self.json_lib.get_tag(tag_id).name))
+            sql_name: str = sanitize(tag.name)
+            json_name: str = sanitize(self.json_lib.get_tag(tag_id).name)
 
             logger.info(
                 "[Name Parity]",

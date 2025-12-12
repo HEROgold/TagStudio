@@ -10,7 +10,6 @@ from PySide6.QtCore import Signal
 from tagstudio.core.enums import TagClickActionOption
 from tagstudio.core.library.alchemy.enums import BrowsingState
 from tagstudio.core.library.alchemy.models import Tag
-from tagstudio.core.utils.types import unwrap
 from tagstudio.qt.mixed.build_tag import BuildTagPanel
 from tagstudio.qt.views.panel_modal import PanelModal
 from tagstudio.qt.views.tag_box_view import TagBoxWidgetView
@@ -48,7 +47,7 @@ class TagBoxWidget(TagBoxWidgetView):
                 #       due to needing to implement a visitor that turns an AST to a string
                 #       So if that exists when you read this, change the following accordingly.
                 current = self.__driver.browsing_history.current
-                suffix = unwrap(
+                suffix = (
                     BrowsingState.from_tag_id(tag.id, self.__driver.browsing_history.current).query
                 )
                 self.__driver.update_browsing_state(

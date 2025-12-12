@@ -13,7 +13,6 @@ from PySide6.QtWidgets import QMessageBox, QPushButton
 from tagstudio.core.constants import RESERVED_NAMESPACE_PREFIX
 from tagstudio.core.library.alchemy.enums import TagColorEnum
 from tagstudio.core.library.alchemy.models import TagColorGroup
-from tagstudio.core.utils.types import unwrap
 from tagstudio.qt.mixed.build_color import BuildColorPanel
 from tagstudio.qt.mixed.field_widget import FieldWidget
 from tagstudio.qt.mixed.tag_color_label import TagColorLabel
@@ -89,7 +88,7 @@ class ColorBoxWidget(FieldWidget):
         color_widgets: list[TagColorLabel] = []
 
         while self.base_layout.itemAt(0):
-            unwrap(self.base_layout.takeAt(0)).widget().deleteLater()
+            self.base_layout.takeAt(0).widget().deleteLater()
 
         for color in colors_:
             color_widget = TagColorLabel(

@@ -17,7 +17,6 @@ from tagstudio.core.library.alchemy.constants import (
     JSON_FILENAME,
 )
 from tagstudio.core.library.alchemy.library import Library
-from tagstudio.core.utils.types import unwrap
 from tagstudio.qt.translations import Translations
 from tagstudio.qt.utils import file_opener
 from tagstudio.qt.views.library_info_window_view import LibraryInfoWindowView
@@ -115,7 +114,7 @@ class LibraryInfoWindow(LibraryInfoWindowView):
             self.view_legacy_json_file.setEnabled(True)
             self.view_legacy_json_file.clicked.connect(
                 lambda: file_opener.open_file(
-                    unwrap(self.lib.library_dir) / TS_FOLDER_NAME / JSON_FILENAME, file_manager=True
+                    (self.lib.library_dir) / TS_FOLDER_NAME / JSON_FILENAME, file_manager=True
                 )
             )
         else:
@@ -123,7 +122,7 @@ class LibraryInfoWindow(LibraryInfoWindowView):
 
         self.open_backups_folder.clicked.connect(
             lambda: file_opener.open_file(
-                unwrap(self.lib.library_dir) / TS_FOLDER_NAME / BACKUP_FOLDER_NAME
+                (self.lib.library_dir) / TS_FOLDER_NAME / BACKUP_FOLDER_NAME
             )
         )
 
@@ -141,17 +140,17 @@ class LibraryInfoWindow(LibraryInfoWindowView):
 
     @property
     def __is_json_library_present(self):
-        json_path = unwrap(self.lib.library_dir) / TS_FOLDER_NAME / JSON_FILENAME
+        json_path = (self.lib.library_dir) / TS_FOLDER_NAME / JSON_FILENAME
         return json_path.exists()
 
     @property
     def __backups_count(self):
-        backups_path = unwrap(self.lib.library_dir) / TS_FOLDER_NAME / BACKUP_FOLDER_NAME
+        backups_path = (self.lib.library_dir) / TS_FOLDER_NAME / BACKUP_FOLDER_NAME
         return len(os.listdir(backups_path))
 
     @property
     def __backups_size(self):
-        backups_path = unwrap(self.lib.library_dir) / TS_FOLDER_NAME / BACKUP_FOLDER_NAME
+        backups_path = (self.lib.library_dir) / TS_FOLDER_NAME / BACKUP_FOLDER_NAME
         size: int = 0
 
         for f in backups_path.glob("*"):

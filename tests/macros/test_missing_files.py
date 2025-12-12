@@ -10,7 +10,6 @@ import pytest
 from tagstudio.core.library.alchemy.enums import BrowsingState
 from tagstudio.core.library.alchemy.library import Library
 from tagstudio.core.library.alchemy.registries.unlinked_registry import UnlinkedRegistry
-from tagstudio.core.utils.types import unwrap
 
 CWD = Path(__file__).parent
 
@@ -21,7 +20,7 @@ def test_refresh_missing_files(library: Library):
     registry = UnlinkedRegistry(lib=library)
 
     # touch the file `one/two/bar.md` but in wrong location to simulate a moved file
-    (unwrap(library.library_dir) / "bar.md").touch()
+    ((library.library_dir) / "bar.md").touch()
 
     # no files actually exist, so it should return all entries
     assert list(registry.refresh_unlinked_files()) == [0, 1]

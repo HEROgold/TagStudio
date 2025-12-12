@@ -28,7 +28,6 @@ from PySide6.QtWidgets import (
 from tagstudio.core.library.alchemy.enums import TagColorEnum
 from tagstudio.core.library.alchemy.library import Library
 from tagstudio.core.library.alchemy.models import Tag, TagColorGroup
-from tagstudio.core.utils.types import unwrap
 from tagstudio.qt.mixed.tag_color_preview import TagColorPreview
 from tagstudio.qt.mixed.tag_color_selection import TagColorSelection
 from tagstudio.qt.mixed.tag_search import TagSearchModal, TagSearchPanel
@@ -627,8 +626,8 @@ class BuildTagPanel(PanelWidget):
         self.setTabOrder(self.shorthand_field, self.aliases_add_button)
         self.setTabOrder(self.aliases_add_button, self.parent_tags_add_button)
         self.setTabOrder(self.parent_tags_add_button, self.color_button)
-        self.setTabOrder(self.color_button, unwrap(self.panel_cancel_button))
-        self.setTabOrder(unwrap(self.panel_cancel_button), unwrap(self.panel_save_button))
-        self.setTabOrder(unwrap(self.panel_save_button), self.aliases_table.cellWidget(0, 1))
+        self.setTabOrder(self.color_button, (self.panel_cancel_button))
+        self.setTabOrder((self.panel_cancel_button), (self.panel_save_button))
+        self.setTabOrder((self.panel_save_button), self.aliases_table.cellWidget(0, 1))
         self.name_field.selectAll()
         self.name_field.setFocus()
