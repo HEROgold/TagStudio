@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Union
 from warnings import catch_warnings
 
 import structlog
+from herogold.sentinel import MISSING
 from PySide6 import QtCore, QtGui
 from PySide6.QtCore import QSize, Qt, Signal
 from PySide6.QtGui import QShowEvent
@@ -28,7 +29,6 @@ from tagstudio.core.constants import RESERVED_TAG_END, RESERVED_TAG_START
 from tagstudio.core.library.alchemy.enums import BrowsingState, TagColorEnum
 from tagstudio.core.library.alchemy.library import Library
 from tagstudio.core.library.alchemy.models import Tag
-from tagstudio.core.utils.sentinel import MISSING
 from tagstudio.qt.mixed.tag_widget import TagWidget
 from tagstudio.qt.models.palette import ColorType, get_tag_color
 from tagstudio.qt.translations import Translations
