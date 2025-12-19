@@ -364,7 +364,7 @@ class JsonMigrationModal(QObject):
             minimum=0,
             maximum=0,
         )
-        pb.setCancelButton(None)  # pyright: ignore[reportArgumentType]
+        pb.setCancelButton(None)  
         self.body_wrapper_01.layout().addWidget(pb)
 
         try:

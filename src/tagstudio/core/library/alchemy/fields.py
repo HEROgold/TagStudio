@@ -32,7 +32,7 @@ class BaseField(Base):
 
     @declared_attr
     def type(self) -> Mapped[ValueType]:
-        return relationship(foreign_keys=[self.type_key], lazy=False)  # type: ignore # pyright: ignore[reportArgumentType]
+        return relationship(foreign_keys=[self.type_key], lazy=False)  # type: ignore 
 
     @declared_attr
     def entry_id(self) -> Mapped[int]:
@@ -40,7 +40,7 @@ class BaseField(Base):
 
     @declared_attr
     def entry(self) -> Mapped[Entry]:
-        return relationship(foreign_keys=[self.entry_id])  # type: ignore # pyright: ignore[reportArgumentType]
+        return relationship(foreign_keys=[self.entry_id])  # type: ignore 
 
     @declared_attr
     def position(self) -> Mapped[int]:

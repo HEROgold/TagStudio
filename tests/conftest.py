@@ -78,7 +78,7 @@ def library(request, library_dir: Path):  # pyright: ignore
     library_path = library_dir
     if hasattr(request, "param"):
         if isinstance(request.param, TemporaryDirectory):
-            library_path = Path(request.param.name)  # pyright: ignore[reportArgumentType]
+            library_path = Path(request.param.name)  
         else:
             library_path = Path(request.param)
 
@@ -161,7 +161,7 @@ def qt_driver(library: Library, library_dir: Path):
         ci = True
 
     with patch("tagstudio.qt.ts_qt.Consumer"), patch("tagstudio.qt.ts_qt.CustomRunnable"):
-        driver = QtDriver(Args())  # pyright: ignore[reportArgumentType]
+        driver = QtDriver(Args())  
 
         driver.app = Mock()
         driver.main_window = Mock()
@@ -182,6 +182,6 @@ def qt_driver(library: Library, library_dir: Path):
 def generate_tag() -> Generator[Callable[..., Tag]]:
     def inner(name: str, **kwargs) -> Tag:  # pyright: ignore
         params = dict(name=name, color_namespace="tagstudio-standard", color_slug="red") | kwargs
-        return Tag(**params)  # pyright: ignore[reportArgumentType]
+        return Tag(**params)  
 
     yield inner
