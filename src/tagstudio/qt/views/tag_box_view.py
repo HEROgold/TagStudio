@@ -35,7 +35,8 @@ class TagBoxWidgetView(FieldWidget):
         tags_ = sorted(list(tags), key=lambda tag: self.__lib.tag_display_name(tag))
         logger.info("[TagBoxWidget] Tags:", tags=tags)
         while self.__root_layout.itemAt(0):
-            self.__root_layout.takeAt(0).widget().deleteLater()  # pyright: ignore[reportOptionalMemberAccess]
+            if i := self.__root_layout.takeAt(0):
+                i.widget().deleteLater()
 
         for tag in tags_:
             tag_widget = TagWidget(tag, library=self.__lib, has_edit=True, has_remove=True)

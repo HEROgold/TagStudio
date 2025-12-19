@@ -51,11 +51,13 @@ class SplashScreen:
 
     def get_pixmap(self) -> QPixmap:
         """Get the pixmap used for the splash screen."""
-        pixmap: QPixmap | None = self.rm.get(f"splash_{self.splash_name}")  # pyright: ignore[reportAssignmentType]
+        pixmap = self.rm.get(f"splash_{self.splash_name}")
         if not pixmap:
             logger.error("[Splash] Splash screen not found:", splash_name=self.splash_name)
             pixmap = QPixmap(960, 540)
             pixmap.fill(QColor("black"))
+        if not isinstance(pixmap, QPixmap):
+            raise TypeError("Splash pixmap is not a QPixmap instance.")
         painter = QPainter(pixmap)
         point_size_scale: float = 1.0
         match painter.font().family():

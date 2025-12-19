@@ -139,6 +139,9 @@ class PreviewPanelView(QWidget):
             update_preview (bool): Should the file preview be updated?
             (Only works with one or more items selected)
         """
+        if self.lib.library_dir is None:
+            raise ValueError("Library directory is not set.")
+
         self._selected = selected
         try:
             # No Items Selected
@@ -153,9 +156,10 @@ class PreviewPanelView(QWidget):
             # One Item Selected
             elif len(selected) == 1:
                 entry_id = selected[0]
-                entry: Entry = self.lib.get_entry(entry_id)
-
-                filepath: Path = (self.lib.library_dir) / entry.path
+                entry = self.lib.get_entry(entry_id)
+                if entry is None:
+                    raise ValueError(f"Entry with ID {entry_id} not found in library.")
+                filepath = self.lib.library_dir / entry.path
 
                 if update_preview:
                     stats: FileAttributeData = self.__thumb.display_file(filepath)

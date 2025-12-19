@@ -59,6 +59,7 @@ from PySide6.QtSvg import QSvgRenderer
 from tagstudio.core.constants import (
     FONT_SAMPLE_SIZES,
     FONT_SAMPLE_TEXT,
+    IMAGE_FORMATS,
 )
 from tagstudio.core.exceptions import NoRendererError
 from tagstudio.core.library.ignore import Ignore
@@ -432,12 +433,7 @@ class ThumbRenderer(QObject):
             color="#00FF00",
         )
 
-        # Get icon by name
-        icon: Image.Image | None = self.rm.get(name)  # pyright: ignore[reportAssignmentType]
-        if not icon:
-            icon = self.rm.get("file_generic")  # pyright: ignore[reportAssignmentType]
-            if not icon:
-                icon = Image.new(mode="RGBA", size=(32, 32), color="magenta")
+        icon = self.get_icon_by_name(name)
 
         # Resize icon to fit icon_ratio
         icon = icon.resize((math.ceil(size[0] // icon_ratio), math.ceil(size[1] // icon_ratio)))
@@ -459,6 +455,17 @@ class ThumbRenderer(QObject):
         )
 
         return im
+
+    def get_icon_by_name(self, name):
+        icon = None
+        if (
+            ((i := self.rm.get(name)) or (i := self.rm.get("file_generic")))
+            and isinstance(i, Image.Image)
+        ):
+            icon = i
+        else:
+            icon = Image.new(mode="RGBA", size=(32, 32), color="magenta")
+        return icon
 
     def _render_corner_icon(
         self,
@@ -530,12 +537,7 @@ class ThumbRenderer(QObject):
             color=primary_color,
         )
 
-        # Get icon by name
-        icon: Image.Image | None = self.rm.get(name)  # pyright: ignore[reportAssignmentType]
-        if not icon:
-            icon = self.rm.get("file_generic")  # pyright: ignore[reportAssignmentType]
-            if not icon:
-                icon = Image.new(mode="RGBA", size=(32, 32), color="magenta")
+        icon = self.get_icon_by_name(name)
 
         # Resize icon to fit icon_ratio
         icon = icon.resize(
@@ -951,13 +953,14 @@ class ThumbRenderer(QObject):
         """
         im: Image.Image | None = None
 
-        cover = comic_info.find(f"./*Page[@Type='{cover_type}']")
-        if cover is not None:
+        if cover := comic_info.find(f"./*Page[@Type='{cover_type}']"):
             pages = [f for f in archive.namelist() if f != "ComicInfo.xml"]
-            page_name = pages[int(cover.get("Image"))]
-            if page_name.endswith((".png", ".jpg", ".jpeg", ".gif", ".bmp", ".svg")):
-                image_data = archive.read(page_name)
-                im = Image.open(BytesIO(image_data))
+            index = cover.get("Image")
+            if index is not None:
+                page_name = pages[int(index)]
+                if page_name.endswith(IMAGE_FORMATS):
+                    image_data = archive.read(page_name)
+                    im = Image.open(BytesIO(image_data))
 
         return im
 

@@ -45,66 +45,31 @@ class Pagination(QWidget):
         self.root_layout.setSpacing(3)
 
         # [<] ----------------------------------
-        self.prev_button = QPushButton()
-        prev_icon: Image.Image = self.rm.get("bxs-left-arrow")  # pyright: ignore[reportAssignmentType]
-        prev_icon = theme_fg_overlay(prev_icon, use_alpha=False)
-        self.prev_button.setIcon(QPixmap.fromImage(ImageQt.ImageQt(prev_icon)))
-        self.prev_button.setIconSize(QSize(12, 12))
-        self.prev_button.setMinimumSize(self.button_size)
-        self.prev_button.setMaximumSize(self.button_size)
+        self.initialize_navigation_buttons()
 
         # --- [1] ------------------------------
-        self.start_button = QPushButton()
-        self.start_button.setMinimumSize(self.button_size)
-        self.start_button.setMaximumSize(self.button_size)
+        self.initialize_start_button()
 
         # ------ ... ---------------------------
-        self.start_ellipses = QLabel()
-        self.start_ellipses.setMinimumSize(self.button_size)
-        self.start_ellipses.setMaximumSize(self.button_size)
-        self.start_ellipses.setText(". . .")
+        self.initialize_start_ellipses()
 
         # --------- [3][4] ---------------------
-        self.start_buffer_container = QWidget()
-        self.start_buffer_layout = QHBoxLayout(self.start_buffer_container)
-        self.start_buffer_layout.setContentsMargins(0, 0, 0, 0)
-        self.start_buffer_layout.setSpacing(3)
+        self.initialize_start_buffer()
 
         # ---------------- [5] -----------------
-        self.current_page_field = QLineEdit()
-        self.current_page_field.setMinimumSize(self.button_size)
-        self.current_page_field.setMaximumSize(self.button_size)
-        self.validator = Validator(1, self.page_count)
-        self.current_page_field.setValidator(self.validator)
-        self.current_page_field.returnPressed.connect(
-            lambda: self._goto_page(int(self.current_page_field.text()) - 1)
-        )
+        self.initialize_current_page_field()
 
         # -------------------- [6][7] ----------
-        self.end_buffer_container = QWidget()
-        self.end_buffer_layout = QHBoxLayout(self.end_buffer_container)
-        self.end_buffer_layout.setContentsMargins(0, 0, 0, 0)
-        self.end_buffer_layout.setSpacing(3)
+        self.initialize_end_buffer()
 
         # -------------------------- ... -------
-        self.end_ellipses = QLabel()
-        self.end_ellipses.setMinimumSize(self.button_size)
-        self.end_ellipses.setMaximumSize(self.button_size)
-        self.end_ellipses.setText(". . .")
+        self.initialize_end_ellipses()
 
         # ----------------------------- [42] ---
-        self.end_button = QPushButton()
-        self.end_button.setMinimumSize(self.button_size)
-        self.end_button.setMaximumSize(self.button_size)
+        self.initialize_end_button()
 
         # ---------------------------------- [>]
-        self.next_button = QPushButton()
-        next_icon: Image.Image = self.rm.get("bxs-right-arrow")  # pyright: ignore[reportAssignmentType]
-        next_icon = theme_fg_overlay(next_icon, use_alpha=False)
-        self.next_button.setIcon(QPixmap.fromImage(ImageQt.ImageQt(next_icon)))
-        self.next_button.setIconSize(QSize(12, 12))
-        self.next_button.setMinimumSize(self.button_size)
-        self.next_button.setMaximumSize(self.button_size)
+        self.initialize_next_button()
 
         # Add Widgets to Root Layout
         self.root_layout.addStretch(1)
@@ -120,6 +85,68 @@ class Pagination(QWidget):
         self.root_layout.addStretch(1)
 
         self._populate_buffer_buttons()
+
+    def initialize_next_button(self):
+        self.next_button = QPushButton()
+        if (next_icon := self.rm.get("bxs-right-arrow")) and isinstance(next_icon, Image.Image):
+            next_icon = theme_fg_overlay(next_icon, use_alpha=False)
+        self.next_button.setIcon(QPixmap.fromImage(ImageQt.ImageQt(next_icon)))
+        self.next_button.setIconSize(QSize(12, 12))
+        self.next_button.setMinimumSize(self.button_size)
+        self.next_button.setMaximumSize(self.button_size)
+
+    def initialize_end_button(self):
+        self.end_button = QPushButton()
+        self.end_button.setMinimumSize(self.button_size)
+        self.end_button.setMaximumSize(self.button_size)
+
+    def initialize_end_ellipses(self):
+        self.end_ellipses = QLabel()
+        self.end_ellipses.setMinimumSize(self.button_size)
+        self.end_ellipses.setMaximumSize(self.button_size)
+        self.end_ellipses.setText(". . .")
+
+    def initialize_end_buffer(self):
+        self.end_buffer_container = QWidget()
+        self.end_buffer_layout = QHBoxLayout(self.end_buffer_container)
+        self.end_buffer_layout.setContentsMargins(0, 0, 0, 0)
+        self.end_buffer_layout.setSpacing(3)
+
+    def initialize_current_page_field(self):
+        self.current_page_field = QLineEdit()
+        self.current_page_field.setMinimumSize(self.button_size)
+        self.current_page_field.setMaximumSize(self.button_size)
+        self.validator = Validator(1, self.page_count)
+        self.current_page_field.setValidator(self.validator)
+        self.current_page_field.returnPressed.connect(
+            lambda: self._goto_page(int(self.current_page_field.text()) - 1)
+        )
+
+    def initialize_start_buffer(self):
+        self.start_buffer_container = QWidget()
+        self.start_buffer_layout = QHBoxLayout(self.start_buffer_container)
+        self.start_buffer_layout.setContentsMargins(0, 0, 0, 0)
+        self.start_buffer_layout.setSpacing(3)
+
+    def initialize_start_ellipses(self):
+        self.start_ellipses = QLabel()
+        self.start_ellipses.setMinimumSize(self.button_size)
+        self.start_ellipses.setMaximumSize(self.button_size)
+        self.start_ellipses.setText(". . .")
+
+    def initialize_start_button(self):
+        self.start_button = QPushButton()
+        self.start_button.setMinimumSize(self.button_size)
+        self.start_button.setMaximumSize(self.button_size)
+
+    def initialize_navigation_buttons(self):
+        self.prev_button = QPushButton()
+        if (prev_icon := self.rm.get("bxs-left-arrow")) and isinstance(prev_icon, Image.Image):
+            prev_icon = theme_fg_overlay(prev_icon, use_alpha=False)
+        self.prev_button.setIcon(QPixmap.fromImage(ImageQt.ImageQt(prev_icon)))
+        self.prev_button.setIconSize(QSize(12, 12))
+        self.prev_button.setMinimumSize(self.button_size)
+        self.prev_button.setMaximumSize(self.button_size)
 
     def update_buttons(self, page_count: int, index: int, emit: bool = True):
         # Guard
@@ -300,6 +327,6 @@ class Validator(QIntValidator):
         super().__init__(bottom, top)
 
     @override
-    def fixup(self, input: str) -> str:
+    def fixup(self, input: str) -> str:  # ty:ignore[invalid-method-override] # (str) -> str is correct.
         input = input.strip("0")
         return super().fixup(str(self.top()) if input else "1")

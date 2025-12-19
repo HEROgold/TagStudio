@@ -28,3 +28,5 @@ RESERVED_TAG_START = 0
 RESERVED_TAG_END = 999
 
 RESERVED_NAMESPACE_PREFIX = "tagstudio"
+
+IMAGE_FORMATS = (".png", ".jpg", ".jpeg", ".gif", ".bmp", ".svg")

@@ -288,9 +288,11 @@ class TagSearchPanel(PanelWidget):
                 self.scroll_layout.addWidget(new_tw)
 
         # Assign the tag to the widget at the given index.
-        tag_widget: TagWidget = self.scroll_layout.itemAt(index).widget()  # pyright: ignore[reportAssignmentType]
-        assert isinstance(tag_widget, TagWidget)
-        tag_widget.set_tag(tag)
+        if (
+            (tag_widget  := self.scroll_layout.itemAt(index).widget())
+            and isinstance(tag_widget, TagWidget)
+        ):
+            tag_widget.set_tag(tag)
 
         # Set tag widget viability and potentially return early
         tag_widget.setHidden(bool(not tag))
@@ -298,10 +300,7 @@ class TagSearchPanel(PanelWidget):
             return
 
         # Configure any other aspects of the tag widget
-        has_remove_button = False
-        if not self.is_tag_chooser:
-            has_remove_button = tag.id not in range(RESERVED_TAG_START, RESERVED_TAG_END)
-        tag_widget.has_remove = has_remove_button
+        self.configure_tag_widget(tag, tag_widget)
 
         with catch_warnings(record=True):
             tag_widget.on_edit.disconnect()
@@ -326,6 +325,12 @@ class TagSearchPanel(PanelWidget):
             tag_widget.search_for_tag_action.setEnabled(True)
         else:
             tag_widget.search_for_tag_action.setEnabled(False)
+
+    def configure_tag_widget(self, tag, tag_widget):
+        has_remove_button = False
+        if not self.is_tag_chooser:
+            has_remove_button = tag.id not in range(RESERVED_TAG_START, RESERVED_TAG_END)
+        tag_widget.has_remove = has_remove_button
 
     def update_limit(self, index: int):
         logger.info("[TagSearchPanel] Updating tag limit")

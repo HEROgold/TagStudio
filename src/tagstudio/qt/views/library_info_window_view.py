@@ -269,36 +269,9 @@ class LibraryInfoWindowView(QWidget):
         )
 
         self.unlinked_icon = QLabel()
-        unlinked_image: Image.Image = self.driver.rm.get("unlinked_stat")  # pyright: ignore[reportAssignmentType]
-        unlinked_pixmap = QPixmap.fromImage(ImageQt.ImageQt(unlinked_image))
-        unlinked_pixmap.setDevicePixelRatio(self.devicePixelRatio())
-        unlinked_pixmap = unlinked_pixmap.scaledToWidth(
-            math.floor((row_height - icon_margin) * self.devicePixelRatio()),
-            Qt.TransformationMode.SmoothTransformation,
-        )
-        self.unlinked_icon.setPixmap(unlinked_pixmap)
-
-        self.ignored_icon = QLabel()
-        ignored_image: Image.Image = self.driver.rm.get("ignored_stat")  # pyright: ignore[reportAssignmentType]
-        ignored_pixmap = QPixmap.fromImage(ImageQt.ImageQt(ignored_image))
-        ignored_pixmap.setDevicePixelRatio(self.devicePixelRatio())
-        ignored_pixmap = ignored_pixmap.scaledToWidth(
-            math.floor((row_height - icon_margin) * self.devicePixelRatio()),
-            Qt.TransformationMode.SmoothTransformation,
-        )
-        self.ignored_icon.setPixmap(ignored_pixmap)
-
-        self.dupe_file_icon = QLabel()
-        dupe_file_image: Image.Image = self.driver.rm.get("dupe_file_stat")  # pyright: ignore[reportAssignmentType]
-        dupe_file_pixmap = QPixmap.fromImage(
-            ImageQt.ImageQt(theme_fg_overlay(dupe_file_image, use_alpha=False))
-        )
-        dupe_file_pixmap.setDevicePixelRatio(self.devicePixelRatio())
-        dupe_file_pixmap = dupe_file_pixmap.scaledToWidth(
-            math.floor((row_height - icon_margin) * self.devicePixelRatio()),
-            Qt.TransformationMode.SmoothTransformation,
-        )
-        self.dupe_file_icon.setPixmap(dupe_file_pixmap)
+        self.initialize_unlinked_icon(row_height, icon_margin)
+        self.initialize_ignored_icon(row_height, icon_margin)
+        self.initialize_duplicate_file_icon(row_height, icon_margin)
 
         self.cleanup_grid_layout.addWidget(
             self.unlinked_icon,
@@ -463,3 +436,39 @@ class LibraryInfoWindowView(QWidget):
         self.root_layout.addStretch(2)
         self.root_layout.addWidget(self.details_container)
         self.root_layout.addWidget(self.button_container)
+
+    def initialize_duplicate_file_icon(self, row_height, icon_margin):
+        self.dupe_file_icon = QLabel()
+        if (dupe_file_image := self.driver.rm.get("dupe_file_stat")) and isinstance(
+            dupe_file_image, Image.Image
+        ):
+            dupe_file_pixmap = QPixmap.fromImage(
+                ImageQt.ImageQt(theme_fg_overlay(dupe_file_image, use_alpha=False))
+            )
+            dupe_file_pixmap.setDevicePixelRatio(self.devicePixelRatio())
+            dupe_file_pixmap = dupe_file_pixmap.scaledToWidth(
+                math.floor((row_height - icon_margin) * self.devicePixelRatio()),
+                Qt.TransformationMode.SmoothTransformation,
+            )
+            self.dupe_file_icon.setPixmap(dupe_file_pixmap)
+
+    def initialize_ignored_icon(self, row_height, icon_margin):
+        self.ignored_icon = QLabel()
+        if (ignored_image := self.driver.rm.get("ignored_stat")) and isinstance(ignored_image, Image.Image):
+            ignored_pixmap = QPixmap.fromImage(ImageQt.ImageQt(ignored_image))
+            ignored_pixmap.setDevicePixelRatio(self.devicePixelRatio())
+            ignored_pixmap = ignored_pixmap.scaledToWidth(
+                math.floor((row_height - icon_margin) * self.devicePixelRatio()),
+                Qt.TransformationMode.SmoothTransformation,
+            )
+            self.ignored_icon.setPixmap(ignored_pixmap)
+
+    def initialize_unlinked_icon(self, row_height, icon_margin):
+        if (unlinked_image := self.driver.rm.get("unlinked_stat")) and isinstance(unlinked_image, Image.Image):
+            unlinked_pixmap = QPixmap.fromImage(ImageQt.ImageQt(unlinked_image))
+            unlinked_pixmap.setDevicePixelRatio(self.devicePixelRatio())
+            unlinked_pixmap = unlinked_pixmap.scaledToWidth(
+                math.floor((row_height - icon_margin) * self.devicePixelRatio()),
+                Qt.TransformationMode.SmoothTransformation,
+            )
+            self.unlinked_icon.setPixmap(unlinked_pixmap)
