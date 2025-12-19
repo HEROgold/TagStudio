@@ -152,7 +152,7 @@ class FileOpenerLabel(QLabel):
         self.filepath = filepath
 
     @override
-    def mousePressEvent(self, ev: QMouseEvent) -> None:
+    def mousePressEvent(self, ev: QMouseEvent) -> None:  # ty:ignore[invalid-method-override]
         """Handle mouse press events.
 
         On a left click, open the file in the default file explorer.
@@ -161,6 +161,8 @@ class FileOpenerLabel(QLabel):
         Args:
             ev (QMouseEvent): The mouse press event.
         """
+        if self.filepath is None:
+            raise ValueError("File path is not set for FileOpenerLabel.")
         if ev.button() == Qt.MouseButton.LeftButton:
             opener = FileOpenerHelper(self.filepath)
             opener.open_explorer()
