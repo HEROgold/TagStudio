@@ -20,7 +20,7 @@ class ProgressWidget(QWidget):
         *,
         window_title: str = "",
         label_text: str = "",
-        cancel_button_text: str | None,
+        cancel_button_text: str = "",
         minimum: int,
         maximum: int,
     ):
@@ -29,7 +29,7 @@ class ProgressWidget(QWidget):
         self.pb = QProgressDialog(
             labelText=label_text,
             minimum=minimum,
-            cancelButtonText=cancel_button_text,  # pyright: ignore[reportArgumentType]
+            cancelButtonText=cancel_button_text,  
             maximum=maximum,
         )
         self.root.addWidget(self.pb)

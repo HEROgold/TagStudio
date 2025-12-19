@@ -99,7 +99,7 @@ from tagstudio.core.library.alchemy.models import (
 from tagstudio.core.library.alchemy.visitors import SQLBoolExpressionBuilder
 from tagstudio.core.library.json.library import Library as JsonLibrary
 from tagstudio.qt.translations import Translations
-
+from herogold.sentinel import MISSING
 if TYPE_CHECKING:
     from sqlalchemy import Select
 
@@ -209,10 +209,10 @@ class LibraryStatus:
 class Library:
     """Class for the Library object, and all CRUD operations made upon it."""
 
-    library_dir: Path | None = None
-    storage_path: Path | str | None = None
-    engine: Engine | None = None
-    folder: Folder | None = None
+    library_dir: Path = MISSING
+    storage_path: Path | str = MISSING
+    engine: Engine = MISSING
+    folder: Folder = MISSING
     included_files: set[Path] = set()
 
     def __init__(self) -> None:
@@ -224,9 +224,9 @@ class Library:
     def close(self):
         if self.engine:
             self.engine.dispose()
-        self.library_dir = None
-        self.storage_path = None
-        self.folder = None
+        self.library_dir = MISSING
+        self.storage_path = MISSING
+        self.folder = MISSING
         self.included_files = set()
 
         self.dupe_entries_count = -1

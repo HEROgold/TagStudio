@@ -19,5 +19,5 @@ class ClickableLabel(QLabel):
         super().__init__()
 
     @override
-    def mousePressEvent(self, ev: QMouseEvent):
+    def mousePressEvent(self, ev: QMouseEvent):  # ty:ignore[invalid-method-override]
         self.clicked.emit()

@@ -22,7 +22,7 @@ class ClickableSlider(QSlider):
         super().__init__(*args, **kwargs)
 
     @override
-    def mousePressEvent(self, ev: QMouseEvent):
+    def mousePressEvent(self, ev: QMouseEvent):  # ty:ignore[invalid-method-override] # see mouseReleaseEvent
         """Override to handle mouse clicks.
 
         Overriding the mousePressEvent allows us to seek
@@ -46,6 +46,6 @@ class ClickableSlider(QSlider):
         super().mousePressEvent(ev)
 
     @override
-    def mouseReleaseEvent(self, ev: QMouseEvent) -> None:
+    def mouseReleaseEvent(self, ev: QMouseEvent) -> None:  # ty:ignore[invalid-method-override] # This is correct. Ty is wrong here.
         self.setSliderDown(False)
         return super().mouseReleaseEvent(ev)

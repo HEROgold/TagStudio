@@ -1106,17 +1106,19 @@ class QtDriver(DriverMixin, QObject):
 
     def run_macro(self, name: MacroID, entry_id: int):
         """Run a specific Macro on an Entry given a Macro name."""
-        entry: Entry = self.lib.get_entry(entry_id)
-        full_path = self.lib.library_dir / entry.path
-        source = "" if entry.path.parent == Path(".") else entry.path.parts[0].lower()
+        if self.lib.library_dir is None:
+            raise ValueError("Library directory is not set.")
+        if entry := self.lib.get_entry(entry_id):
+            full_path = self.lib.library_dir / entry.path
+            source = "" if entry.path.parent == Path(".") else entry.path.parts[0].lower()
 
-        logger.info(
-            "running macro",
-            source=source,
-            macro=name,
-            entry_id=entry.id,
-            grid_idx=entry_id,
-        )
+            logger.info(
+                "running macro",
+                source=source,
+                macro=name,
+                entry_id=entry.id,
+                grid_idx=entry_id,
+            )
 
         if name == MacroID.AUTOFILL:
             for macro_id in MacroID:
