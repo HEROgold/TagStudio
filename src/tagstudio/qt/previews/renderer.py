@@ -119,13 +119,16 @@ class _TarFile(tarfile.TarFile):
         return self.getnames()
 
     def read(self, name: str) -> bytes:
-        return self.extractfile(name).read()
+        if file := self.extractfile(name):
+            return file.read()
+        raise KeyError(f"File {name} not found in archive.")
 
 
 type _Archive_T = (
     type[zipfile.ZipFile] | type[rarfile.RarFile] | type[_SevenZipFile] | type[_TarFile]
 )
 type _Archive = zipfile.ZipFile | rarfile.RarFile | _SevenZipFile | _TarFile
+type _ZipThumbStatus = Literal["found", "missing", "error"]
 
 
 class ThumbRenderer(QObject):
@@ -664,7 +667,7 @@ class ThumbRenderer(QObject):
                     artwork = Image.open(BytesIO(flac_covers[0].data))
             elif ext in [".mp4", ".m4a", ".aac"]:
                 mp4_tags: mp4.MP4 = mp4.MP4(filepath)
-                mp4_covers: list | None = mp4_tags.get("covr")  # pyright: ignore[reportAssignmentType]
+                mp4_covers: list | None = mp4_tags.get("covr")
                 if mp4_covers:
                     artwork = Image.open(BytesIO(mp4_covers[0]))
             if artwork:
@@ -822,6 +825,31 @@ class ThumbRenderer(QObject):
         return im
 
     @staticmethod
+    def _load_zip_thumbnail(
+        filepath: Path,
+        candidates: list[str],
+        background_color: str = "#1e1e1e",
+    ) -> tuple[Image.Image | None, _ZipThumbStatus]:
+        """Load the first matching thumbnail from a zip-based archive."""
+        try:
+            with zipfile.ZipFile(filepath, "r") as zip_file:
+                names = set(zip_file.namelist())
+                for candidate in candidates:
+                    if candidate in names:
+                        file_data = zip_file.read(candidate)
+                        thumb_im = Image.open(BytesIO(file_data))
+                        if thumb_im:
+                            background = Image.new("RGB", thumb_im.size, color=background_color)
+                            background.paste(thumb_im)
+                            return background, "found"
+                return None, "missing"
+        except zipfile.BadZipFile as e:
+            logger.error("Couldn't render thumbnail", filepath=filepath, error=e)
+        except (OSError, ValueError, UnidentifiedImageError) as e:
+            logger.error("Couldn't render thumbnail", filepath=filepath, error=type(e).__name__)
+        return None, "error"
+
+    @staticmethod
     def _open_doc_thumb(filepath: Path) -> Image.Image | None:
         """Extract and render a thumbnail for an OpenDocument file.
 
@@ -829,19 +857,9 @@ class ThumbRenderer(QObject):
             filepath (Path): The path of the file.
         """
         file_path_within_zip = "Thumbnails/thumbnail.png"
-        im: Image.Image | None = None
-        with zipfile.ZipFile(filepath, "r") as zip_file:
-            # Check if the file exists in the zip
-            if file_path_within_zip in zip_file.namelist():
-                # Read the specific file into memory
-                file_data = zip_file.read(file_path_within_zip)
-                thumb_im = Image.open(BytesIO(file_data))
-                if thumb_im:
-                    im = Image.new("RGB", thumb_im.size, color="#1e1e1e")
-                    im.paste(thumb_im)
-            else:
-                logger.error("Couldn't render thumbnail", filepath=filepath)
-
+        im, status = ThumbRenderer._load_zip_thumbnail(filepath, [file_path_within_zip])
+        if status == "missing":
+            logger.error("Couldn't render thumbnail", filepath=filepath)
         return im
 
     @staticmethod
@@ -852,18 +870,9 @@ class ThumbRenderer(QObject):
             filepath (Path): The path of the file.
         """
         file_path_within_zip = "preview.png"
-        im: Image.Image | None = None
-        with zipfile.ZipFile(filepath, "r") as zip_file:
-            # Check if the file exists in the zip
-            if file_path_within_zip in zip_file.namelist():
-                # Read the specific file into memory
-                file_data = zip_file.read(file_path_within_zip)
-                thumb_im = Image.open(BytesIO(file_data))
-                if thumb_im:
-                    im = Image.new("RGB", thumb_im.size, color="#1e1e1e")
-                    im.paste(thumb_im)
-            else:
-                logger.error("Couldn't render thumbnail", filepath=filepath)
+        im, status = ThumbRenderer._load_zip_thumbnail(filepath, [file_path_within_zip])
+        if status == "missing":
+            logger.error("Couldn't render thumbnail", filepath=filepath)
 
         return im
 
@@ -875,22 +884,9 @@ class ThumbRenderer(QObject):
             filepath (Path): The path of the file.
         """
         file_path_within_zip = "docProps/thumbnail.jpeg"
-        im: Image.Image | None = None
-        try:
-            with zipfile.ZipFile(filepath, "r") as zip_file:
-                # Check if the file exists in the zip
-                if file_path_within_zip in zip_file.namelist():
-                    # Read the specific file into memory
-                    file_data = zip_file.read(file_path_within_zip)
-                    thumb_im = Image.open(BytesIO(file_data))
-                    if thumb_im:
-                        im = Image.new("RGB", thumb_im.size, color="#1e1e1e")
-                        im.paste(thumb_im)
-                else:
-                    logger.error("Couldn't render thumbnail", filepath=filepath)
-        except zipfile.BadZipFile as e:
-            logger.error("Couldn't render thumbnail", filepath=filepath, error=e)
-
+        im, status = ThumbRenderer._load_zip_thumbnail(filepath, [file_path_within_zip])
+        if status == "missing":
+            logger.error("Couldn't render thumbnail", filepath=filepath)
         return im
 
     @staticmethod
@@ -1046,7 +1042,7 @@ class ThumbRenderer(QObject):
                 font = ImageFont.truetype(filepath, size=font_size)
                 text_wrapped: str = wrap_full_text(
                     FONT_SAMPLE_TEXT,
-                    font=font,  # pyright: ignore[reportArgumentType]
+                    font=font,  
                     width=size,
                     draw=draw,
                 )
@@ -1186,33 +1182,12 @@ class ThumbRenderer(QObject):
         """
         preview_thumb_dir = "preview.jpg"
         quicklook_thumb_dir = "QuickLook/Thumbnail.jpg"
-        im: Image.Image | None = None
-
-        def get_image(path: str) -> Image.Image | None:
-            thumb_im: Image.Image | None = None
-            # Read the specific file into memory
-            file_data = zip_file.read(path)
-            thumb_im = Image.open(BytesIO(file_data))
-            return thumb_im
-
-        try:
-            with zipfile.ZipFile(filepath, "r") as zip_file:
-                thumb: Image.Image | None = None
-
-                # Check if the file exists in the zip
-                if preview_thumb_dir in zip_file.namelist():
-                    thumb = get_image(preview_thumb_dir)
-                elif quicklook_thumb_dir in zip_file.namelist():
-                    thumb = get_image(quicklook_thumb_dir)
-                else:
-                    logger.error("Couldn't render thumbnail", filepath=filepath)
-
-                if thumb:
-                    im = Image.new("RGB", thumb.size, color="#1e1e1e")
-                    im.paste(thumb)
-        except zipfile.BadZipFile as e:
-            logger.error("Couldn't render thumbnail", filepath=filepath, error=e)
-
+        im, status = ThumbRenderer._load_zip_thumbnail(
+            filepath,
+            [preview_thumb_dir, quicklook_thumb_dir],
+        )
+        if status == "missing":
+            logger.error("Couldn't render thumbnail", filepath=filepath)
         return im
 
     @staticmethod
@@ -1441,7 +1416,9 @@ class ThumbRenderer(QObject):
             padding_factor = 18
 
             im_ = im
-            icon: Image.Image = self.rm.get("ignored")  # pyright: ignore[reportAssignmentType]
+            icon = self.rm.get("ignored")
+            if not isinstance(icon, Image.Image):
+                raise TypeError("Resource Manager returned invalid image type!")
 
             icon = icon.resize(
                 (
